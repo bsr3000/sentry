@@ -7,8 +7,10 @@ import createReactClass from 'create-react-class';
 import styled from 'react-emotion';
 
 import {openCreateIncidentModal} from 'app/actionCreators/modal';
+import {addErrorMessage, addSuccessMessage} from 'app/actionCreators/indicator';
 import {t, tct, tn} from 'app/locale';
 import ActionLink from 'app/components/actions/actionLink';
+import AssigneeSelector from 'app/components/assigneeSelector';
 import Checkbox from 'app/components/checkbox';
 import DropdownLink from 'app/components/dropdownLink';
 import ExternalLink from 'app/components/links/externalLink';
@@ -217,6 +219,25 @@ const IssueListActions = createReactClass({
     this.setState({
       allInQuerySelected: true,
     });
+  },
+
+  handleBulkAssign() {
+    const issues = this.state.selectedIds;
+    const numIssues = issues.size;
+
+    console.log(issues);
+
+    const successText = tn('%s issue assigned', '%s issues assigned', numIssues);
+    addSuccessMessage(successText);
+
+    if (!issues) {
+      const errorText = tn(
+        'Error assigning %s issue',
+        'Error assigning %s issues',
+        numIssues
+      );
+      addErrorMessage(errorText);
+    }
   },
 
   handleUpdate(data) {
@@ -502,6 +523,26 @@ const IssueListActions = createReactClass({
                 <MenuItem divider={true} />
                 <MenuItem noAnchor={true}>
                   <ActionLink
+                    className="action-bulk-assign"
+                    disabled={!anySelected}
+                    onAction={() => this.handleBulkAssign()}
+                    shouldConfirm={this.shouldConfirm('assign')}
+                    message={confirm('assign', true)}
+                    confirmLabel={label('assign')}
+                  >
+                    <AssigneeSelector
+                      // eslint-disable-next-line react/no-children-prop
+                      children={() =>
+                        tn('Assign %s issue', 'Assign %s issues', numIssues)
+                      }
+                    />
+
+                    {/* tn('Assign %s issue', 'Assign %s issues', numIssues) */}
+                  </ActionLink>
+                </MenuItem>
+                <MenuItem divider={true} />
+                <MenuItem noAnchor={true}>
+                  <ActionLink
                     className="action-delete"
                     disabled={!anySelected}
                     onAction={this.handleDelete}
@@ -538,6 +579,7 @@ const IssueListActions = createReactClass({
               </Tooltip>
             </div>
           </ActionSet>
+
           <Box w={160} mx={2} className="hidden-xs hidden-sm">
             <Flex>
               <StyledToolbarHeader>{t('Graph:')}</StyledToolbarHeader>

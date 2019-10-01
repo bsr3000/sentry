@@ -1,5 +1,6 @@
 import React from 'react';
 import {browserHistory} from 'react-router';
+import * as Sentry from '@sentry/browser';
 
 import SentryTypes from 'app/sentryTypes';
 import {t} from 'app/locale';
@@ -150,6 +151,9 @@ class OrganizationReleases extends AsyncView {
 
   renderBody() {
     const {location, organization} = this.props;
+
+    Sentry.captureException('error 4');
+    Sentry.captureMessage('message 4');
 
     return (
       <PageContent>

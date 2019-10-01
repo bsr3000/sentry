@@ -817,7 +817,7 @@ SENTRY_FEATURES = {
     # Enable the 'discover' interface.
     "organizations:discover": False,
     # Enable the Discover v2 query builder
-    "organizations:discover-v2-query-builder": False,
+    "organizations:discover-v2-query-builder": True,
     # Enable attaching arbitrary files to events.
     "organizations:event-attachments": False,
     # Allow organizations to configure built-in symbol sources.
@@ -825,9 +825,9 @@ SENTRY_FEATURES = {
     # Allow organizations to configure custom external symbol sources.
     "organizations:custom-symbol-sources": True,
     # Enable the events stream interface.
-    "organizations:events": False,
+    "organizations:events": True,
     # Enable events v2 instead of the events stream
-    "organizations:events-v2": False,
+    "organizations:events-v2": True,
     # Enable multi project selection
     "organizations:global-views": False,
     # Turns on grouping info.

@@ -23,11 +23,23 @@ import SentryTypes from 'app/sentryTypes';
 import TextOverflow from 'app/components/textOverflow';
 import space from 'app/styles/space';
 
-const AssigneeSelectorComponent = createReactClass({
+type Props = {
+  id?: string;
+  size?: number;
+  memberList?: any[]; // HACK(leedongwei)
+};
+
+type State = {
+  loading: boolean;
+  assignedTo: any; // HACK(leedongwei)
+  memberList: any; // HACK(leedongwei)
+};
+
+const AssigneeSelectorComponent = createReactClass<Props, State>({
   displayName: 'AssigneeSelector',
 
   propTypes: {
-    id: PropTypes.string.isRequired,
+    id: PropTypes.string,
     size: PropTypes.number,
     // Either a list of users, or null. If null, members will
     // be read from the MemberListStore. The prop is useful when the
@@ -69,20 +81,27 @@ const AssigneeSelectorComponent = createReactClass({
 
   getDefaultProps() {
     return {
+      id: undefined,
       size: 20,
+      memberList: [],
     };
   },
 
   getInitialState() {
-    const group = GroupStore.get(this.props.id);
-    const memberList = MemberListStore.loaded ? MemberListStore.getAll() : null;
-    const loading = GroupStore.hasStatus(this.props.id, 'assignTo');
-
-    return {
-      assignedTo: group && group.assignedTo,
-      memberList,
-      loading,
+    const state = {
+      loading: false,
+      assignedTo: null,
+      memberList: MemberListStore.loaded ? MemberListStore.getAll() : null,
     };
+
+    const {id} = this.props;
+    if (id) {
+      const group = GroupStore.get(id);
+      state.assignedTo = group && group.assignedTo;
+      state.loading = GroupStore.hasStatus(id, 'assignTo');
+    }
+
+    return state;
   },
 
   componentWillReceiveProps(nextProps) {
@@ -128,6 +147,10 @@ const AssigneeSelectorComponent = createReactClass({
   },
 
   assignableTeams() {
+    if (!this.props.id) {
+      return [];
+    }
+
     const group = GroupStore.get(this.props.id);
 
     return (
@@ -145,9 +168,10 @@ const AssigneeSelectorComponent = createReactClass({
   },
 
   onGroupChange(itemIds) {
-    if (!itemIds.has(this.props.id)) {
+    if (!this.props.id || !itemIds.has(this.props.id)) {
       return;
     }
+
     const group = GroupStore.get(this.props.id);
     this.setState({
       assignedTo: group && group.assignedTo,
@@ -165,13 +189,7 @@ const AssigneeSelectorComponent = createReactClass({
     this.setState({loading: true});
   },
 
-  handleAssign(
-    {
-      value: {type, assignee},
-    },
-    state,
-    e
-  ) {
+  handleAssign({value: {type, assignee}}, _state, e) {
     if (type === 'member') {
       this.assignToUser(assignee);
     }
@@ -192,7 +210,9 @@ const AssigneeSelectorComponent = createReactClass({
 
   renderNewMemberNodes() {
     const {size} = this.props;
-    const members = AssigneeSelectorComponent.putSessionUserFirst(this.memberList());
+    const members = (AssigneeSelectorComponent as any).putSessionUserFirst(
+      this.memberList()
+    );
 
     return members.map(member => {
       return {
@@ -249,6 +269,21 @@ const AssigneeSelectorComponent = createReactClass({
       {id: 'team-header', hideGroupLabel: true, items: teams},
       {id: 'members-header', items: members},
     ];
+  },
+
+  renderDropdownButton({getActorProps}) {
+    const {assignedTo} = this.state;
+
+    return (
+      <DropdownButton {...getActorProps({})}>
+        {assignedTo ? (
+          <ActorAvatar actor={assignedTo} className="avatar" size={24} />
+        ) : (
+          <IconUser src="icon-user" />
+        )}
+        <StyledChevron src="icon-chevron-down" />
+      </DropdownButton>
+    );
   },
 
   render() {
@@ -318,18 +353,7 @@ const AssigneeSelectorComponent = createReactClass({
               )
             }
           >
-            {({getActorProps}) => {
-              return (
-                <DropdownButton {...getActorProps({})}>
-                  {assignedTo ? (
-                    <ActorAvatar actor={assignedTo} className="avatar" size={24} />
-                  ) : (
-                    <IconUser src="icon-user" />
-                  )}
-                  <StyledChevron src="icon-chevron-down" />
-                </DropdownButton>
-              );
-            }}
+            {this.props.children ? this.props.children : this.renderDropdownButton}
           </DropdownAutoComplete>
         )}
       </div>
@@ -373,17 +397,25 @@ const IconContainer = styled('div')`
   flex-shrink: 0;
 `;
 
-const MenuItemWrapper = styled(({py, ...props}) => <div {...props} />)`
-  cursor: pointer;
+// const MenuItemWrapper = styled(({py, ...props}) => <div {...props} />)`
+const MenuItemWrapper = styled('div')<{
+  px?: number;
+  py?: number;
+  disabled?: boolean;
+}>`
   display: flex;
   align-items: center;
+
   font-size: 13px;
-  ${props =>
-    typeof props.py !== 'undefined' &&
+  ${p =>
+    typeof p.py !== 'undefined' &&
     `
-      padding-top: ${props.py};
-      padding-bottom: ${props.py};
-    `};
+    padding-top: ${p.py};
+    padding-bottom: ${p.py};
+  `};
+
+  cursor: pointer;
+  ${p => p.disabled && 'pointer-events: none;'}
 `;
 
 const InviteMemberLink = styled(Link)`

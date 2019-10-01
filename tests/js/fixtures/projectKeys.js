@@ -3,7 +3,7 @@ export function ProjectKeys(params = []) {
     {
       dsn: {
         secret:
-          'http://188ee45a58094d939428d8585aa6f661:a33bf9aba64c4bbdaf873bb9023b6d2d@dev.getsentry.net:8000/1',
+          'http://d566b58d0fd245dc8e47e0b1ac2d2518:0619ef5189844f86b82644108d112961@dev.getsentry.net:8000/1',
         minidump:
           'http://dev.getsentry.net:8000/api/1/minidump?sentry_key=188ee45a58094d939428d8585aa6f661',
         public: 'http://188ee45a58094d939428d8585aa6f661@dev.getsentry.net:8000/1',
