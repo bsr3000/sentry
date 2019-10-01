@@ -134,7 +134,7 @@ const OrganizationContext = createReactClass({
     metric.mark('organization-details-fetch-start');
     const promises = [
       this.props.api.requestPromise(this.getOrganizationDetailsEndpoint(), {
-        query: {detailed},
+        query: {detailed: detailed ? 1 : 0},
       }),
       fetchOrganizationEnvironments(this.props.api, this.getOrganizationSlug()),
     ];

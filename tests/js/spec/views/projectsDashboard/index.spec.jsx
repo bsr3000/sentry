@@ -32,9 +32,7 @@ describe('OrganizationDashboard', function() {
   ]);
 
   const team = TestStubs.Team();
-  const noProjectTeam = TestStubs.Team({projects: []});
   const teams = [team];
-  const noProjectTeams = [noProjectTeam];
 
   beforeEach(function() {
     MockApiClient.addMockResponse({
@@ -50,6 +48,8 @@ describe('OrganizationDashboard', function() {
 
   describe('empty state', function() {
     it('renders with no projects', function() {
+      const noProjectTeams = [TestStubs.Team({projects: []})];
+
       const wrapper = mount(
         <Dashboard
           teams={noProjectTeams}
