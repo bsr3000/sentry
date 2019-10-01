@@ -10,8 +10,8 @@ import withTeamsForUser from 'app/utils/withTeamsForUser';
 
 class LightWeightInstallPromptBanner extends React.Component {
   static propTypes = {
-    organization: PropTypes.object,
-    teams: PropTypes.arrayOf(SentryTypes.Project),
+    organization: SentryTypes.Organization,
+    teams: PropTypes.arrayOf(SentryTypes.Team),
     loadingTeams: PropTypes.bool,
     error: PropTypes.instanceOf(Error),
   };
@@ -22,7 +22,6 @@ class LightWeightInstallPromptBanner extends React.Component {
     }
     return (
       <InstallPromptBanner
-        detailed={0}
         {...this.props}
         projects={_.uniq(_.flatten(this.props.teams.map(team => team.projects)), 'id')}
       />

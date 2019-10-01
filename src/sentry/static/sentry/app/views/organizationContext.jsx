@@ -42,7 +42,7 @@ const OrganizationContext = createReactClass({
     useLastOrganization: PropTypes.bool,
     organizationsLoading: PropTypes.bool,
     organizations: PropTypes.arrayOf(SentryTypes.Organization),
-    detailed: PropTypes.number,
+    detailed: PropTypes.bool,
   },
 
   childContextTypes: {
@@ -53,7 +53,7 @@ const OrganizationContext = createReactClass({
 
   getDefaultProps() {
     return {
-      detailed: 1,
+      detailed: true,
     };
   },
 

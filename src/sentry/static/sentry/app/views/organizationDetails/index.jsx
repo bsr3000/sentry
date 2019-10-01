@@ -127,11 +127,11 @@ class DeletionPending extends Component {
 
 class OrganizationDetailsBody extends Component {
   static propTypes = {
-    detailed: PropTypes.number,
+    detailed: PropTypes.bool,
   };
 
   static defaultProps = {
-    detailed: 1,
+    detailed: true,
   };
 
   static contextTypes = {
@@ -163,14 +163,6 @@ class OrganizationDetailsBody extends Component {
 }
 
 export default class OrganizationDetails extends Component {
-  static propTypes = {
-    detailed: PropTypes.number,
-  };
-
-  static defaultProps = {
-    detailed: 1,
-  };
-
   componentDidUpdate(prevProps) {
     if (
       prevProps.params &&
@@ -183,7 +175,7 @@ export default class OrganizationDetails extends Component {
   render() {
     return (
       <OrganizationContext includeSidebar useLastOrganization {...this.props}>
-        <OrganizationDetailsBody detailed={this.props.detailed}>
+        <OrganizationDetailsBody {...this.props}>
           {this.props.children}
         </OrganizationDetailsBody>
       </OrganizationContext>
@@ -192,5 +184,5 @@ export default class OrganizationDetails extends Component {
 }
 
 export function LightWeightOrganizationDetails(props) {
-  return <OrganizationDetails detailed={0} {...props} />;
+  return <OrganizationDetails detailed={false} {...props} />;
 }
